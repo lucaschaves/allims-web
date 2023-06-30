@@ -1,0 +1,4 @@
+/* Chrome, Edge, and Safari */
+.allims-sidebar-aside-nav::-webkit-scrollbar {
+    width: 9px;
+}

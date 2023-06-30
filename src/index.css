@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    font-size: 14px;
+
+    --main-color-100: #0a26a1;
+    --main-color-200: #071c7c;
+    --main-color-300: #071c7c;
+    --main-color-400: #071c7c;
+    --main-color-500: #071c7c;
+    --main-color-600: #071c7c;
+    --main-color-700: #071c7c;
+    --main-color-800: #071c7c;
+    --main-color-900: #071c7c;
+}
