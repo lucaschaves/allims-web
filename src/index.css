@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+    overflow: hidden;
     font-size: 14px;
 
     --main-color-100: #0a26a1;

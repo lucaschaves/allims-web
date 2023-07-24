@@ -1,8 +1,5 @@
-import { Sidebar, Split } from "@/components";
-import { ContextLayout } from "@/layout";
 import { getApi } from "@/services";
 import { useCallback, useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 
 const dataMenuRight = {
     success: true,
@@ -23,7 +20,7 @@ const dataMenuRight = {
 };
 
 export function Listing() {
-    const { hasPin, togglePin } = useOutletContext<ContextLayout>();
+    // const { hasPin, togglePin } = useOutletContext<ContextLayout>();
 
     const [open, setOpen] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
@@ -73,50 +70,71 @@ export function Listing() {
         getMenu();
     }, [getMenu]);
 
-    return (
-        <Split.Container open={open} hasPin={hasPin}>
-            <Split.PanelLeft>
-                <div className="flex gap-5 h-full w-full ">
-                    <button
-                        onClick={() => setOpen(!open)}
-                        className="h-10 w-32 bg-red-400"
-                    >
-                        open
-                    </button>
-                </div>
-            </Split.PanelLeft>
-            <Split.PanelRight>
-                <Sidebar.Container
-                    open={openSidebar}
-                    toggle={() => setOpenSidebar(!openSidebar)}
-                    direction={hasPin ? "left" : "right"}
-                >
-                    <Sidebar.ContainerNav>
-                        {loadingScreen && <Sidebar.LoadingItems />}
-                        {moduleItems.map((mod, ind) => (
-                            <Sidebar.Button
-                                key={ind}
-                                title={mod.title}
-                                onClick={(i) => setMenuActive(i)}
-                                open={false}
-                                active={!!menuActive?.title === mod.title}
-                                iconLeft={mod.icon}
-                                openRight
-                            />
-                        ))}
-                    </Sidebar.ContainerNav>
-                </Sidebar.Container>
-                {open ? (
-                    <button
-                        onClick={togglePin}
-                        className="h-10 w-32 bg-blue-400"
-                    >
-                        pin
-                    </button>
-                ) : (
-                    <></>
-                )}
-            </Split.PanelRight>
-        </Split.Container>
-    );
+    return <div>Liasting</div>;
+
+    // return (
+    //     <Split.Container open={open} hasPin={false}>
+    //         <Split.PanelLeft>
+    //             <Sidebar.Container
+    //                 open={openSidebar}
+    //                 toggle={() => setOpenSidebar(!openSidebar)}
+    //             >
+    //                 <Sidebar.ContainerNav>
+    //                     {loadingScreen && <Sidebar.LoadingItems />}
+    //                     {moduleItems.map((mod, ind) => (
+    //                         <Sidebar.Button
+    //                             key={ind}
+    //                             title={mod.title}
+    //                             onClick={(i) => setMenuActive(i)}
+    //                             open={false}
+    //                             active={!!menuActive?.title === mod.title}
+    //                             iconLeft={mod.icon}
+    //                             openRight
+    //                         />
+    //                     ))}
+    //                 </Sidebar.ContainerNav>
+    //             </Sidebar.Container>
+    //             <div className="flex gap-5 h-full w-full ">
+    //                 <button
+    //                     onClick={() => setOpen(!open)}
+    //                     className="h-10 w-32 bg-red-400"
+    //                 >
+    //                     open
+    //                 </button>
+    //             </div>
+    //         </Split.PanelLeft>
+    //         <Split.PanelRight>
+    //             <Sidebar.Container
+    //                 open={openSidebar}
+    //                 toggle={() => setOpenSidebar(!openSidebar)}
+    //                 // direction={false ? "left" : "right"}
+    //             >
+    //                 <Sidebar.ContainerNav>
+    //                     {loadingScreen && <Sidebar.LoadingItems />}
+    //                     {moduleItems.map((mod, ind) => (
+    //                         <Sidebar.Button
+    //                             key={ind}
+    //                             title={mod.title}
+    //                             onClick={(i) => setMenuActive(i)}
+    //                             open={false}
+    //                             active={!!menuActive?.title === mod.title}
+    //                             iconLeft={mod.icon}
+    //                             openRight
+    //                         />
+    //                     ))}
+    //                 </Sidebar.ContainerNav>
+    //             </Sidebar.Container>
+    //             {open ? (
+    //                 <button
+    //                     // onClick={togglePin}
+    //                     className="h-10 w-32 bg-blue-400"
+    //                 >
+    //                     pin
+    //                 </button>
+    //             ) : (
+    //                 <></>
+    //             )}
+    //         </Split.PanelRight>
+    //     </Split.Container>
+    // );
 }

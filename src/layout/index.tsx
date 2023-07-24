@@ -1,208 +1,81 @@
 import { Header, Sidebar } from "@/components";
-import { getApi } from "@/services";
-import { joinClassName } from "@/utils";
-import { useCallback, useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
-
-const dataMenu = {
-    success: true,
-    data: [
-        {
-            tagId: "perfil",
-            group: "footer",
-            title: "Perfil",
-            acronym: null,
-            icon: "FiUser",
-            route: "/app/perfil",
-            disabled: false,
-        },
-        {
-            tagId: "suporte",
-            group: "footer",
-            title: "Suporte",
-            acronym: null,
-            icon: "MdOutlineSupportAgent",
-            route: "/app/suporte",
-            disabled: false,
-        },
-        {
-            tagId: "ajuda",
-            group: "footer",
-            title: "Ajuda",
-            acronym: null,
-            icon: "FiHelpCircle",
-            route: "/app/ajuda",
-            disabled: false,
-        },
-        {
-            tagId: "configuracoes",
-            group: "footer",
-            title: "Configurações",
-            acronym: "Config",
-            icon: "FiSettings",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "aPI",
-            group: "footer",
-            title: "API",
-            acronym: null,
-            icon: "FiBook",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "comercial",
-            group: "main",
-            title: "Comercial",
-            acronym: null,
-            icon: "FiBriefcase",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "agenda",
-            group: "main",
-            title: "Agenda",
-            acronym: null,
-            icon: "FiCalendar",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "recepcao",
-            group: "main",
-            title: "Recepção",
-            acronym: null,
-            icon: "FiInbox",
-            route: "/module/recepcao/ordensDeServico",
-            disabled: false,
-        },
-        {
-            tagId: "analitico",
-            group: "main",
-            title: "Analítico",
-            acronym: null,
-            icon: "ImLab",
-            route: "/module/analitico/gerenciamentoDeAmostras",
-            disabled: false,
-        },
-        {
-            tagId: "publicacao",
-            group: "main",
-            title: "Publicação",
-            acronym: null,
-            icon: "FiPenTool",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "almoxarifado",
-            group: "main",
-            title: "Almoxarifado",
-            acronym: null,
-            icon: "FiArchive",
-            route: "/module/almoxarifado/lotes",
-            disabled: false,
-        },
-        {
-            tagId: "qualidade",
-            group: "main",
-            title: "Qualidade",
-            acronym: null,
-            icon: "FiAward",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "faturamento",
-            group: "main",
-            title: "Faturamento",
-            acronym: null,
-            icon: "FiDollarSign",
-            route: "",
-            disabled: true,
-        },
-        {
-            tagId: "labOnline",
-            group: "main",
-            title: "LabOnline",
-            acronym: null,
-            icon: "FiGlobe",
-            route: "/module/labOnline/amostras",
-            disabled: false,
-        },
-        {
-            tagId: "gerencial",
-            group: "main",
-            title: "Gerencial",
-            acronym: null,
-            icon: "FiPieChart",
-            route: "",
-            disabled: true,
-        },
-    ],
-};
+import { FAKER_MODULES } from "@/faker";
+import { Accordion, Popover, Split } from "@/lib";
+import { getDeviceType, joinClassName } from "@/utils";
+import { MouseEvent, useCallback, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 export interface ContextLayout {
     hasPin: boolean;
     togglePin: () => void;
 }
 
-export function Layout() {
-    const [openSidebar, setOpenSidebar] = useState(false);
-    const [hasPin, setPin] = useState(false);
-    const [moduleItems, setModuleItems] = useState<any[]>([]);
-    const [menuItems, setMenuItems] = useState<any[]>([]);
-    const [loadingScreen, setLoadingScreen] = useState(false);
-    const [loadingItems, setLoadingItems] = useState(false);
-    const [moduleActive, setModuleActive] = useState({
-        title: "Home",
-        icon: "FiHome",
-    });
-    const [menuActive, setMenuActive] = useState<any>({});
+interface IItem {
+    title: string;
+    path: string;
+    icon?: string;
+    module?: string;
+}
 
-    const handleModule = useCallback(
-        async (item: any) => {
-            if (item.title !== moduleActive.title) {
-                setLoadingItems(true);
-            }
-            const { success, data } = await getApi({
-                url: `/safe/engine/menu?tagId=${item.tagId}&v=2`,
-            });
-            if (success) {
-                setMenuItems(data);
-                setModuleActive(item);
-                setMenuActive({});
-            }
-            setLoadingItems(false);
-        },
-        [moduleActive.title]
+export function Layout() {
+    const isMobileAndPortrait =
+        getDeviceType().device === "mobile" &&
+        getDeviceType().orientation === "portrait";
+
+    const navigate = useNavigate();
+
+    const [openPopover, setOpenPopover] = useState<IItem>({} as IItem);
+    const [openSplit, setOpenSplit] = useState(true);
+
+    const [sidebarActive, setSidebarActive] = useState<IItem>({} as IItem);
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarItems, setSidebarItems] = useState<IItem[]>(() =>
+        FAKER_MODULES.filter((v) => v.module === "module")
     );
 
-    const getMenu = useCallback(async () => {
-        const { success, data } = await getApi({
-            url: "/safe/engine/menu?v=2",
-        });
-        if (success) {
-            const moduleItemsFilter = data;
-            // .filter((it: { route?: string }) => !!it?.route)
-            // .filter((it: { group: string }) => it.group === "main");
-            setModuleItems(moduleItemsFilter);
-        }
-        setLoadingScreen(false);
+    const [toolbarActive, setToolbarActive] = useState<IItem>({} as IItem);
+    const [isToolbarOpen, setToolbarOpen] = useState(false);
+    const [toolbarItems, setToolbarItems] = useState<IItem[]>([]);
+
+    const getToolbarItems = useCallback((path: string) => {
+        const itemsTool = FAKER_MODULES.filter((v) => v.module === path);
+        setToolbarItems(itemsTool);
     }, []);
 
-    const togglePin = useCallback(() => {
-        setOpenSidebar(false);
-        setPin(!hasPin);
-    }, [hasPin]);
+    const getSidebarSubItems = useCallback((path: string) => {
+        return FAKER_MODULES.filter((v) => v.module === path);
+    }, []);
 
-    useEffect(() => {
-        setLoadingScreen(true);
-        getMenu();
-    }, [getMenu]);
+    const handleSidebarItem = useCallback(
+        (event: MouseEvent<HTMLButtonElement>, item: IItem) => {
+            setSidebarActive(item);
+            getToolbarItems(item.path);
+            setOpenPopover({} as IItem);
+            setSidebarOpen(false);
+            navigate(item.path);
+        },
+        [getToolbarItems, navigate]
+    );
+
+    const handleToolbarItem = useCallback(
+        (event: MouseEvent<HTMLButtonElement>, item: IItem) => {
+            setToolbarActive(item);
+            setOpenSplit(!openSplit);
+            setToolbarOpen(false);
+        },
+        [openSplit]
+    );
+
+    const handlePopover = useCallback(
+        (event: MouseEvent<HTMLButtonElement>, item: IItem) => {
+            if (getSidebarSubItems(item.path).length) {
+                setOpenPopover(item);
+            } else {
+                handleSidebarItem(event, item);
+            }
+        },
+        [getSidebarSubItems, handleSidebarItem]
+    );
 
     return (
         <div
@@ -215,35 +88,152 @@ export function Layout() {
                 "bg-gray-300"
             )}
         >
-            <Header toggle={() => setOpenSidebar(!openSidebar)} />
-            <div className={joinClassName("flex", "gap-1", "h-full", "w-full")}>
+            <Header
+                openRight={isToolbarOpen}
+                openLeft={isSidebarOpen}
+                toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
+                toggleToolbar={() => setToolbarOpen(!isToolbarOpen)}
+            />
+            <div className="w-full h-full flex relative">
                 <Sidebar.Container
-                    open={openSidebar}
-                    toggle={() => setOpenSidebar(!openSidebar)}
-                    disabled={hasPin}
+                    open={isSidebarOpen}
+                    toggle={() => setSidebarOpen(!isSidebarOpen)}
                 >
-                    <Sidebar.ContainerNav>
-                        {loadingScreen && <Sidebar.LoadingItems />}
-                        {moduleItems.map((mod, ind) => (
-                            <Sidebar.ContainerExpandItem
-                                key={ind}
-                                items={menuItems}
-                                onClick={(i) => setMenuActive(i)}
-                                onOpen={() => handleModule(mod)}
-                                item={mod}
-                                subItem={menuActive}
-                                id={String(ind)}
-                                loading={loadingItems}
+                    <Sidebar.Btn
+                        title="Module"
+                        disabled
+                        onClick={(i) => ({})}
+                        open={isSidebarOpen}
+                        iconLeft="TbPointFilled"
+                    />
+                    {sidebarItems.map((mod, ind) =>
+                        isSidebarOpen ? (
+                            <Accordion
+                                key={mod?.title ?? ind}
+                                icon={isSidebarOpen}
+                                content={
+                                    <>
+                                        {getSidebarSubItems(mod.path)?.map(
+                                            (v: IItem, i: number) => (
+                                                <div
+                                                    className="w-full"
+                                                    key={v?.title ?? i}
+                                                >
+                                                    <Sidebar.Btn
+                                                        title={v.title}
+                                                        onClick={(e) =>
+                                                            handleSidebarItem(
+                                                                e,
+                                                                v
+                                                            )
+                                                        }
+                                                        open={isSidebarOpen}
+                                                        active={
+                                                            sidebarActive?.title ===
+                                                            v.title
+                                                        }
+                                                        iconLeft={v.icon}
+                                                    />
+                                                </div>
+                                            )
+                                        )}
+                                    </>
+                                }
+                            >
+                                <Sidebar.Btn
+                                    title={mod.title}
+                                    onClick={(e) => handleSidebarItem(e, mod)}
+                                    open
+                                    active={sidebarActive?.title === mod.title}
+                                    iconLeft={mod.icon}
+                                    iconRight={
+                                        getSidebarSubItems(mod.path)?.length
+                                            ? "FiChevronDown"
+                                            : ""
+                                    }
+                                />
+                            </Accordion>
+                        ) : (
+                            <Popover
+                                key={mod?.title ?? ind}
+                                open={openPopover?.title === mod.title}
+                                onClose={() => setOpenPopover({} as IItem)}
+                                content={
+                                    <div
+                                        className={joinClassName(
+                                            "flex-col",
+                                            "w-80",
+                                            "p-2",
+                                            "rounded"
+                                        )}
+                                    >
+                                        {getSidebarSubItems(
+                                            openPopover?.path
+                                        )?.map((v: IItem, i: number) => (
+                                            <div
+                                                className="w-full"
+                                                key={v?.title ?? i}
+                                            >
+                                                <Sidebar.Btn
+                                                    title={v.title}
+                                                    onClick={(e) =>
+                                                        handleSidebarItem(e, v)
+                                                    }
+                                                    open
+                                                    active={
+                                                        sidebarActive?.title ===
+                                                        v.title
+                                                    }
+                                                    iconLeft={v.icon}
+                                                    invert
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                }
+                            >
+                                <Sidebar.Btn
+                                    title={mod.title}
+                                    onClick={(e) => handlePopover(e, mod)}
+                                    open={isSidebarOpen}
+                                    active={sidebarActive?.title === mod.title}
+                                    iconLeft={mod.icon}
+                                />
+                            </Popover>
+                        )
+                    )}
+                </Sidebar.Container>
+                <Split
+                    direction={isMobileAndPortrait ? "col" : "row"}
+                    hasButton={getDeviceType().device !== "desktop"}
+                    childrenLeft={
+                        <div className="w-full">
+                            <Outlet />
+                        </div>
+                    }
+                    disabled
+                    childrenRight={<div>right</div>}
+                />
+                {toolbarItems.length ? (
+                    <Sidebar.Container
+                        open={isToolbarOpen}
+                        toggle={() => setToolbarOpen(!isToolbarOpen)}
+                        direction="right"
+                    >
+                        {toolbarItems.map((mod, ind) => (
+                            <Sidebar.Btn
+                                key={mod?.title ?? ind}
+                                title={mod.title}
+                                onClick={(e) => handleToolbarItem(e, mod)}
+                                open={isToolbarOpen}
+                                active={toolbarActive?.title === mod.title}
+                                iconLeft={mod.icon}
                             />
                         ))}
-                    </Sidebar.ContainerNav>
-                </Sidebar.Container>
-                <Outlet
-                    context={{
-                        togglePin,
-                        hasPin,
-                    }}
-                />
+                    </Sidebar.Container>
+                ) : (
+                    <></>
+                )}
             </div>
         </div>
     );

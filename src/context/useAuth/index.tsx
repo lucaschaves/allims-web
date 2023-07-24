@@ -26,7 +26,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<IUserAuth | null>(() => {
         const auth = window.sessionStorage.getItem(CONSTANT_TOKEN);
         if (auth) {
-            const userAuth = window.sessionStorage.getItem(CONSTANT_USER) || "";
+            const userAuth =
+                window.sessionStorage.getItem(CONSTANT_USER) || "{}";
             return {
                 token: auth,
                 ...JSON.parse(userAuth),

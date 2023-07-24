@@ -1,13 +1,19 @@
-import { AuthProvider } from "@/context";
-import { AppRoutes } from "@/routes";
+import { appRoutes } from "@/routes";
 import ReactDOM from "react-dom/client";
-import { MemoryRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+import { AuthProvider } from "./context";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <MemoryRouter>
-        <AuthProvider>
-            <AppRoutes />
-        </AuthProvider>
-    </MemoryRouter>
+    <AuthProvider>
+        <RouterProvider router={appRoutes()} />
+    </AuthProvider>
 );
+
+// ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+//     <MemoryRouter>
+//         <AuthProvider>
+//             <AppRoutes />
+//         </AuthProvider>
+//     </MemoryRouter>
+// );

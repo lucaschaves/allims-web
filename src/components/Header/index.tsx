@@ -1,22 +1,14 @@
 import { useAuth } from "@/context";
 import { joinClassName } from "@/utils";
 import { useCallback, useState } from "react";
-import { AiFillHome } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
-import {
-    Avatar,
-    Breadcrumb,
-    Icon,
-    IconButton,
-    List,
-    ListItem,
-    ListItemPrefix,
-    ListNav,
-    Popover,
-} from "../../../../allims-library/";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Avatar, Icon, IconButton } from "../../lib";
 
 interface IHeaderProps {
-    toggle: () => void;
+    openRight: boolean;
+    openLeft: boolean;
+    toggleSidebar: () => void;
+    toggleToolbar: () => void;
 }
 
 const itemsData = [
@@ -47,17 +39,24 @@ const itemsData = [
 ];
 
 const Header = (props: IHeaderProps) => {
-    const { toggle } = props;
+    const { openLeft, openRight, toggleSidebar, toggleToolbar } = props;
 
+    const { pathname } = useLocation();
     const navigate = useNavigate();
 
     const { signout } = useAuth();
 
     const [open, setOpen] = useState(false);
 
-    const handleMenu = useCallback(() => {
-        toggle();
-    }, [toggle]);
+    const activeRoute = pathname.split("/").slice(-1)[0];
+
+    const handleSidebar = useCallback(() => {
+        toggleSidebar();
+    }, [toggleSidebar]);
+
+    const handleToolbar = useCallback(() => {
+        toggleToolbar();
+    }, [toggleToolbar]);
 
     const handleSingout = useCallback(() => {
         signout(() => {
@@ -92,25 +91,40 @@ const Header = (props: IHeaderProps) => {
                     "max-w-[90%]"
                 )}
             >
-                <IconButton onClick={handleMenu} color="gray">
-                    <Icon name="FiMenu" size="1.3rem" />
+                <IconButton
+                    onClick={handleSidebar}
+                    color="gray"
+                    variant="text"
+                    className={
+                        openLeft
+                            ? "animate-wiggle-open"
+                            : "animate-wiggle-close"
+                    }
+                >
+                    <Avatar
+                        alt="Allims"
+                        src="https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png"
+                    />
                 </IconButton>
-
-                <Breadcrumb>
-                    <a
-                        href="/"
-                        className="text-gray-600 hover:text-blue-500 flex gap-2 items-center"
-                    >
-                        <AiFillHome />
-                        Analitico
-                    </a>
-                    <a href="/" className="text-gray-600 hover:text-blue-500">
-                        <span>Gerenciamento de Amostra</span>
-                    </a>
-                    <a href="/" className="text-gray-900 hover:text-blue-800">
-                        <span>Filtros</span>
-                    </a>
-                </Breadcrumb>
+                {/* <Breadcrumb>
+                    {pathname
+                        .split("/")
+                        .filter((p) => p)
+                        .map((p) => (
+                            <Link
+                                key={p}
+                                to="module"
+                                className={joinClassName(
+                                    "text-gray-900 hover:text-blue-800",
+                                    activeRoute === "module"
+                                        ? "text-red-500"
+                                        : ""
+                                )}
+                            >
+                                <span>{p}</span>
+                            </Link>
+                        ))}
+                </Breadcrumb> */}
             </div>
 
             <div
@@ -122,7 +136,7 @@ const Header = (props: IHeaderProps) => {
                     "sm:gap-5"
                 )}
             >
-                <IconButton onClick={handleMenu} color="gray">
+                {/* <IconButton onClick={handleSidebar} color="gray" variant="text">
                     <Icon name="FiBell" size="1.3rem" />
                 </IconButton>
 
@@ -130,82 +144,75 @@ const Header = (props: IHeaderProps) => {
                     open={open}
                     onClose={() => setOpen(false)}
                     content={
-                        <List className="p-2 rounded-xl max-w-sm">
-                            <ListNav className="gap-2">
-                                <ListItem className="h-16 hover:bg-slate-100 rounded px-2 gap-2">
-                                    <ListItemPrefix>
-                                        <Avatar src="sdfdsf" alt="lc" />
-                                    </ListItemPrefix>
-                                    <div className="flex flex-col justify-start items-start max-w-[14rem]">
-                                        <span className=" w-full truncate">
-                                            Lucas Mateus Chaves Chaves Chaves
-                                            Lucas Mateus Chaves Chaves Chaves
-                                        </span>
-                                        <span className="truncate">
-                                            lucas.chaves@gmail.com
-                                        </span>
-                                    </div>
-                                </ListItem>
-                                <div className="border-b w-full border-slate-300 h-0.5"></div>
-                                <div className="flex flex-col gap-2">
+                        <List.Container className="max-w-sm p-2">
+                            <List.Nav>
+                                <List.Group>
+                                    <List.Item>
+                                        <List.ItemPrefix>
+                                            <Avatar src="sdfdsf" alt="lc" />
+                                        </List.ItemPrefix>
+                                        <div className="flex flex-col justify-start items-start max-w-[14rem]">
+                                            <span className=" w-full truncate">
+                                                Lucas Mateus Chaves Chaves
+                                                Chaves Lucas Mateus Chaves
+                                                Chaves Chaves
+                                            </span>
+                                            <span className="truncate">
+                                                lucas.chaves@gmail.com
+                                            </span>
+                                        </div>
+                                    </List.Item>
+                                </List.Group>
+                                <List.Group>
                                     {itemsData
                                         .filter(
                                             (item) => item.group === "profile"
                                         )
                                         .map((item, ind) => (
-                                            <ListItem
-                                                key={item.title}
-                                                className={joinClassName(
-                                                    "h-10 hover:bg-slate-100 rounded px-2 gap-2"
-                                                )}
-                                            >
-                                                <ListItemPrefix>
+                                            <List.Item key={item.title}>
+                                                <List.ItemPrefix>
                                                     <Icon name={item.icon} />
-                                                </ListItemPrefix>
+                                                </List.ItemPrefix>
                                                 {item.title}
-                                            </ListItem>
+                                            </List.Item>
                                         ))}
-                                </div>
-                                <div className="border-b w-full border-slate-300 h-0.5"></div>
-                                <div className="flex flex-col gap-2">
+                                </List.Group>
+                                <List.Group>
                                     {itemsData
                                         .filter(
                                             (item) => item.group === "geral"
                                         )
                                         .map((item) => (
-                                            <ListItem
-                                                key={item.title}
-                                                className="h-10 hover:bg-slate-100 rounded px-2 gap-2"
-                                            >
-                                                <ListItemPrefix>
+                                            <List.Item key={item.title}>
+                                                <List.ItemPrefix>
                                                     <Icon name={item.icon} />
-                                                </ListItemPrefix>
+                                                </List.ItemPrefix>
                                                 {item.title}
-                                            </ListItem>
+                                            </List.Item>
                                         ))}
-                                </div>
-
-                                <div className="border-b w-full border-slate-300 h-0.5"></div>
-                                <ListItem
-                                    className="h-10 hover:bg-slate-100 rounded px-2 gap-2"
-                                    onClick={handleSingout}
-                                >
-                                    <ListItemPrefix>
-                                        <Icon name="FiPower" />
-                                    </ListItemPrefix>
-                                    Sair
-                                </ListItem>
-                            </ListNav>
-                        </List>
+                                </List.Group>
+                                <List.Group>
+                                    <List.Item onClick={handleSingout}>
+                                        <List.ItemPrefix>
+                                            <Icon name="FiPower" />
+                                        </List.ItemPrefix>
+                                        Sair
+                                    </List.Item>
+                                </List.Group>
+                            </List.Nav>
+                        </List.Container>
                     }
                 >
-                    <IconButton onClick={() => setOpen(!open)} color="gray">
+                    <IconButton
+                        onClick={() => setOpen(!open)}
+                        color="gray"
+                        variant="text"
+                    >
                         <Icon name="FiUser" size="1.3rem" />
-                        {/* <img src="https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png" /> */}
                     </IconButton>
-                </Popover>
+                </Popover> */}
 
-                <IconButton onClick={handleMenu} color="gray">
+                <IconButton onClick={handleToolbar} color="gray" variant="text">
                     <Icon name="FiMoreVertical" size="1.3rem" />
                 </IconButton>
             </div>
