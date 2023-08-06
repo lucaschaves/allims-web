@@ -1,5 +1,6 @@
 export { default as calculatePage } from "./calculatePage";
 export { default as findNearestBinarySearch } from "./findNearestBinarySearch";
+export { default as getMeta } from "./getMeta";
 export { default as isNumber } from "./isNumber";
 export * from "./joinClassName";
 export { default as now } from "./now";

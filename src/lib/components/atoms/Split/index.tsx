@@ -1,4 +1,10 @@
-import { ReactNode, useRef } from "react";
+import {
+    ReactNode,
+    forwardRef,
+    useCallback,
+    useImperativeHandle,
+    useRef,
+} from "react";
 import { Icon, IconButton, joinClassName } from "../../../";
 
 let x = 0;
@@ -12,15 +18,21 @@ interface IContainerProps {
     hasButton?: boolean;
     direction?: "col" | "row";
     disabled?: boolean;
+    handleResizeStart?: () => void;
 }
 
-const Split = (props: IContainerProps) => {
+export type ISplitRef = {
+    reset(): void;
+};
+
+const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
     const {
         childrenLeft,
         childrenRight,
         direction = "row",
         hasButton = false,
         disabled = false,
+        handleResizeStart = () => ({}),
     } = props;
 
     const refContainer = useRef<HTMLDivElement>(null);
@@ -73,6 +85,8 @@ const Split = (props: IContainerProps) => {
     };
 
     const mouseDownHandler = function (e: any) {
+        handleResizeStart();
+
         x = e.clientX;
         y = e.clientY;
         const rect = refLeft.current?.getBoundingClientRect() || {
@@ -167,18 +181,37 @@ const Split = (props: IContainerProps) => {
         document.removeEventListener("touchend", touchEndHandler);
     };
 
+    const reset = useCallback(() => {
+        if (refLeft.current?.style) {
+            refLeft.current.style.width = "100%";
+        }
+    }, [refLeft]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            reset,
+        }),
+        [reset]
+    );
+
     return (
         <div
             ref={refContainer}
             className={joinClassName(
                 "w-full",
                 "h-full",
+                "transition-width",
+                "duration-500",
                 "overflow-hidden",
                 "flex",
                 `flex-${direction}`
             )}
         >
-            <div ref={refLeft} className="w-full">
+            <div
+                ref={refLeft}
+                className={joinClassName("transition-width", "w-full")}
+            >
                 {childrenLeft}
             </div>
             {hasButton ? (
@@ -189,7 +222,8 @@ const Split = (props: IContainerProps) => {
                         "items-end",
                         "justify-end",
                         "border-2",
-                        "border-slate-100"
+                        "border-slate-100",
+                        disabled ? "hidden" : ""
                     )}
                     ref={refResize}
                     onMouseDown={mouseDownHandler}
@@ -253,6 +287,6 @@ const Split = (props: IContainerProps) => {
             </div>
         </div>
     );
-};
+});
 
 export { Split };

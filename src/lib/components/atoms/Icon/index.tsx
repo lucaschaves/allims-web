@@ -8,6 +8,7 @@ import * as IconsHi from "react-icons/hi";
 import * as IconsIm from "react-icons/im";
 import * as IconsIo from "react-icons/io5";
 import * as IconsMd from "react-icons/md";
+import * as IconsPi from "react-icons/pi";
 import * as IconsSi from "react-icons/si";
 import * as IconsSl from "react-icons/sl";
 import * as IconsTb from "react-icons/tb";
@@ -29,10 +30,11 @@ const Icons = {
     Si: IconsSi,
     Gr: IconsGr,
     Hi: IconsHi,
+    Pi: IconsPi,
 } as any;
 
 export const Icon = (props: IIconProps) => {
-    const { name, ...rest } = props;
+    const { name = "FiAirplay", ...rest } = props;
 
     try {
         const subName = name.split(/(?=[A-Z])/)[0];

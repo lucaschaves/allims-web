@@ -1,18 +1,41 @@
-import {
-    Children,
-    ComponentProps,
-    ReactNode,
-    forwardRef,
-    isValidElement,
-} from "react";
-import { FiChevronRight } from "react-icons/fi";
+import { ComponentProps, ReactNode, forwardRef } from "react";
 import { joinClassName } from "../../../utils";
 
-interface IBreadcrumbProps extends ComponentProps<"ol"> {
+interface IBreadcrumbContainerProps extends ComponentProps<"ol"> {
     children: ReactNode;
 }
 
-const Breadcrumb = forwardRef<HTMLOListElement, IBreadcrumbProps>(
+interface IBreadcrumbLinkProps extends ComponentProps<"li"> {
+    children: ReactNode;
+}
+
+const Link = forwardRef<HTMLLIElement, IBreadcrumbLinkProps>(
+    ({ children, ...rest }, ref) => {
+        return (
+            <li
+                ref={ref}
+                className={joinClassName(
+                    "flex items-center gap-1 text-slate-400 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-light-blue-500"
+                )}
+                {...rest}
+            >
+                {children}
+
+                {/* <FiChevronRight
+                        className={joinClassName(
+                            "stroke-slate-400",
+                            "text-sm",
+                            "mx-1",
+                            "pointer-events-none",
+                            "select-none"
+                        )}
+                    /> */}
+            </li>
+        );
+    }
+);
+
+const Container = forwardRef<HTMLOListElement, IBreadcrumbContainerProps>(
     ({ children, ...rest }, ref) => {
         return (
             <nav
@@ -31,40 +54,19 @@ const Breadcrumb = forwardRef<HTMLOListElement, IBreadcrumbProps>(
                         "flex flex-wrap items-center w-full py-2 px-4 rounded-md gap-1 "
                     )}
                 >
-                    {Children.map(children, (child, index) => {
-                        if (isValidElement(child)) {
-                            return (
-                                <li
-                                    className={joinClassName(
-                                        "flex items-center gap-1 text-slate-400 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-light-blue-500",
-                                        index === Children.count(children) - 1
-                                            ? ""
-                                            : ""
-                                    )}
-                                >
-                                    {child}
-                                    {index !== Children.count(children) - 1 && (
-                                        <FiChevronRight
-                                            className={joinClassName(
-                                                "stroke-slate-400",
-                                                "text-sm",
-                                                "mx-1",
-                                                "pointer-events-none",
-                                                "select-none"
-                                            )}
-                                        />
-                                    )}
-                                </li>
-                            );
-                        }
-                        return null;
-                    })}
+                    {children}
                 </ol>
             </nav>
         );
     }
 );
 
-Breadcrumb.displayName = "Breadcrumb";
+const Breadcrumb = {
+    Container,
+    Link,
+};
+
+Breadcrumb.Container.displayName = "Breadcrumb.Container";
+Breadcrumb.Container.displayName = "Breadcrumb.Link";
 
 export { Breadcrumb };

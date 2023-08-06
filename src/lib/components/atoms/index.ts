@@ -16,5 +16,6 @@ export * from "./Popover";
 export * from "./Slider";
 export * from "./Split";
 export * from "./Switch";
+export * from "./Tag";
 export * from "./Textarea";
 export * from "./Tooltip";

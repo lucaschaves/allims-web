@@ -94,13 +94,13 @@ const IconButton = forwardRef<HTMLButtonElement, IIconButtonProps>(
                     "text-center",
                     "uppercase",
                     "transition-all",
-                    "disabled:opacity-50",
-                    "disabled:shadow-none",
-                    "disabled:pointer-events-none",
                     "rounded-lg",
                     cssVariantAndColor(color)[variant],
                     defaultSizeCss[size],
                     fullWidth ? "w-full" : "",
+                    "disabled:opacity-50",
+                    "disabled:shadow-none",
+                    "disabled:pointer-events-none",
                     className
                 )}
                 {...rest}

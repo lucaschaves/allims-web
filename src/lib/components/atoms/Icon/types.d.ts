@@ -1,5 +1,5 @@
 export interface IIconProps {
-    name: string;
+    name?: string;
     size?: string;
     className?: string;
     disabled?: boolean;

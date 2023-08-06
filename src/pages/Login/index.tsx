@@ -13,7 +13,7 @@ export function Login() {
                 password: "123456",
             },
             () => {
-                navigate("/module", { replace: true });
+                navigate("/", { replace: true });
             }
         );
     }, [navigate, signin]);

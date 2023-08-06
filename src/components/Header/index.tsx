@@ -1,8 +1,18 @@
 import { useAuth } from "@/context";
+import {
+    Avatar,
+    Breadcrumb,
+    Icon,
+    IconButton,
+    List,
+    Popover,
+    Tag,
+    getMeta,
+} from "@/lib";
+import { FAKER_MODULES, MODULES_LOCAL } from "@/server";
 import { joinClassName } from "@/utils";
-import { useCallback, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Avatar, Icon, IconButton } from "../../lib";
+import { MouseEvent, useCallback, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface IHeaderProps {
     openRight: boolean;
@@ -10,33 +20,6 @@ interface IHeaderProps {
     toggleSidebar: () => void;
     toggleToolbar: () => void;
 }
-
-const itemsData = [
-    {
-        title: "Suporte",
-        icon: "MdOutlineSupportAgent",
-        route: "/app/suporte",
-        group: "profile",
-    },
-    {
-        title: "Ajuda",
-        icon: "FiHelpCircle",
-        route: "/app/ajuda",
-        group: "profile",
-    },
-    {
-        title: "Politica de Privacidade",
-        icon: "MdOutlinePrivacyTip",
-        route: "/app/privacyPolicy",
-        group: "geral",
-    },
-    {
-        title: "Termos de uso",
-        icon: "AiOutlineAudit",
-        route: "/app/termsOfUse",
-        group: "geral",
-    },
-];
 
 const Header = (props: IHeaderProps) => {
     const { openLeft, openRight, toggleSidebar, toggleToolbar } = props;
@@ -46,9 +29,28 @@ const Header = (props: IHeaderProps) => {
 
     const { signout } = useAuth();
 
-    const [open, setOpen] = useState(false);
+    const metaEnvorimentTag = getMeta("envTag");
+    const metaEnvorimentTagColor = getMeta("envColor") || "transparent";
+
+    const [openNotify, setOpenNotify] = useState(false);
+    const [openUser, setOpenUser] = useState(false);
+    const [openPopover, setOpenPopover] = useState<number>(-1);
 
     const activeRoute = pathname.split("/").slice(-1)[0];
+
+    const breadcrumbPaths = useCallback(() => {
+        const pathSplit = pathname.split("/").filter((f) => !!f);
+        if (pathSplit.length && pathSplit[0] === "app") {
+            const breads = pathSplit
+                .filter((p) => !!MODULES_LOCAL.find((f) => f.path === p))
+                .map((p) => MODULES_LOCAL.find((f) => f.path === p));
+            return breads;
+        }
+        const breads = pathSplit
+            .filter((p) => !!FAKER_MODULES.find((f) => f.path === p))
+            .map((p) => FAKER_MODULES.find((f) => f.path === p));
+        return breads;
+    }, [pathname]);
 
     const handleSidebar = useCallback(() => {
         toggleSidebar();
@@ -64,6 +66,31 @@ const Header = (props: IHeaderProps) => {
         });
     }, [navigate, signout]);
 
+    const handleSidebarItem = useCallback(
+        (_: MouseEvent<HTMLButtonElement>, item: any) => {
+            setOpenPopover(-1);
+            navigate(item.route);
+        },
+        [navigate]
+    );
+
+    const toggleFullScreen = useCallback(() => {
+        if (!document.fullscreenElement) {
+            document.documentElement?.requestFullscreen();
+        } else {
+            document?.exitFullscreen();
+        }
+        setOpenUser(false);
+    }, []);
+
+    const handleNavigate = useCallback(
+        (path: string) => {
+            navigate(path);
+            setOpenUser(false);
+        },
+        [navigate]
+    );
+
     return (
         <header
             className={joinClassName(
@@ -76,8 +103,8 @@ const Header = (props: IHeaderProps) => {
                 "justify-between",
                 "gap-3",
                 "text-base",
-                "px-3",
-                "py-1"
+                "px-1.5",
+                "animate-show"
             )}
         >
             <div
@@ -95,36 +122,113 @@ const Header = (props: IHeaderProps) => {
                     onClick={handleSidebar}
                     color="gray"
                     variant="text"
-                    className={
-                        openLeft
-                            ? "animate-wiggle-open"
-                            : "animate-wiggle-close"
-                    }
+                    className={joinClassName(
+                        "transition",
+                        openLeft ? "rotate-180" : "rotate-0"
+                    )}
                 >
-                    <Avatar
-                        alt="Allims"
-                        src="https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png"
-                    />
+                    {openLeft ? (
+                        <Icon name="FiX" size="1.3rem" />
+                    ) : (
+                        <Avatar
+                            alt="Allims"
+                            src="https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png"
+                        />
+                    )}
                 </IconButton>
-                {/* <Breadcrumb>
-                    {pathname
-                        .split("/")
-                        .filter((p) => p)
-                        .map((p) => (
-                            <Link
-                                key={p}
-                                to="module"
-                                className={joinClassName(
-                                    "text-gray-900 hover:text-blue-800",
-                                    activeRoute === "module"
-                                        ? "text-red-500"
-                                        : ""
-                                )}
-                            >
-                                <span>{p}</span>
-                            </Link>
-                        ))}
-                </Breadcrumb> */}
+                <Breadcrumb.Container>
+                    {breadcrumbPaths().map((p: any, i, arr) =>
+                        i < arr.length - 1 ? (
+                            <Breadcrumb.Link key={i}>
+                                <Link
+                                    key={p?.path}
+                                    to={p?.route ?? "/"}
+                                    className={joinClassName(
+                                        "text-gray-900 hover:text-blue-800",
+                                        activeRoute === "module"
+                                            ? "text-red-500"
+                                            : ""
+                                    )}
+                                >
+                                    <span>{p?.title ?? p?.path}</span>
+                                </Link>
+                                <Popover
+                                    onClose={() => setOpenPopover(-1)}
+                                    open={openPopover === i}
+                                    content={
+                                        <List.Container>
+                                            <List.Nav className="p-2">
+                                                {p?.children?.map((f: any) => (
+                                                    <List.Item
+                                                        key={f.path}
+                                                        onClick={(e: any) =>
+                                                            handleSidebarItem(
+                                                                e,
+                                                                f
+                                                            )
+                                                        }
+                                                    >
+                                                        <List.ItemPrefix>
+                                                            <Icon
+                                                                name={f.icon}
+                                                            />
+                                                        </List.ItemPrefix>
+                                                        <label
+                                                            htmlFor={f.title}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            {f.title}
+                                                        </label>
+                                                    </List.Item>
+                                                ))}
+                                            </List.Nav>
+                                        </List.Container>
+                                    }
+                                >
+                                    <IconButton
+                                        variant="text"
+                                        size="sm"
+                                        onClick={() => {
+                                            if (p?.children?.length)
+                                                setOpenPopover(i);
+                                        }}
+                                        disabled={!p?.children?.length}
+                                    >
+                                        <Icon
+                                            name="FiChevronRight"
+                                            className={joinClassName(
+                                                "transition",
+                                                "stroke-slate-400",
+                                                "text-sm",
+                                                "mx-1",
+                                                "pointer-events-none",
+                                                "select-none",
+                                                openPopover === i
+                                                    ? "rotate-90"
+                                                    : "rotate-0"
+                                            )}
+                                        />
+                                    </IconButton>
+                                </Popover>
+                            </Breadcrumb.Link>
+                        ) : (
+                            <Breadcrumb.Link key={i}>
+                                <Link
+                                    key={p?.path}
+                                    to={p?.route ?? "/"}
+                                    className={joinClassName(
+                                        "text-gray-900 hover:text-blue-800",
+                                        activeRoute === "module"
+                                            ? "text-red-500"
+                                            : ""
+                                    )}
+                                >
+                                    <span>{p?.title ?? p?.path}</span>
+                                </Link>
+                            </Breadcrumb.Link>
+                        )
+                    )}
+                </Breadcrumb.Container>
             </div>
 
             <div
@@ -133,26 +237,57 @@ const Header = (props: IHeaderProps) => {
                     "items-center",
                     "justify-end",
                     "gap-0.5",
-                    "sm:gap-5"
+                    "sm:gap-3"
                 )}
             >
-                {/* <IconButton onClick={handleSidebar} color="gray" variant="text">
-                    <Icon name="FiBell" size="1.3rem" />
-                </IconButton>
+                {metaEnvorimentTag ? (
+                    <Tag color={metaEnvorimentTagColor}>
+                        {metaEnvorimentTag}
+                    </Tag>
+                ) : (
+                    <></>
+                )}
 
                 <Popover
-                    open={open}
-                    onClose={() => setOpen(false)}
+                    open={openNotify}
+                    onClose={() => setOpenNotify(false)}
                     content={
                         <List.Container className="max-w-sm p-2">
                             <List.Nav>
                                 <List.Group>
-                                    <List.Item>
+                                    <List.Item>Notificação 1</List.Item>
+                                    <List.Item>Notificação 2</List.Item>
+                                </List.Group>
+                            </List.Nav>
+                        </List.Container>
+                    }
+                >
+                    <IconButton
+                        onClick={() => setOpenNotify(!openNotify)}
+                        color="gray"
+                        variant="text"
+                    >
+                        <Icon name="FiBell" size="1.3rem" />
+                    </IconButton>
+                </Popover>
+
+                <Popover
+                    open={openUser}
+                    onClose={() => setOpenUser(false)}
+                    content={
+                        <List.Container className="max-w-sm p-2">
+                            <List.Nav>
+                                <List.Group>
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/user")
+                                        }
+                                    >
                                         <List.ItemPrefix>
                                             <Avatar src="sdfdsf" alt="lc" />
                                         </List.ItemPrefix>
                                         <div className="flex flex-col justify-start items-start max-w-[14rem]">
-                                            <span className=" w-full truncate">
+                                            <span className="w-full truncate">
                                                 Lucas Mateus Chaves Chaves
                                                 Chaves Lucas Mateus Chaves
                                                 Chaves Chaves
@@ -163,34 +298,95 @@ const Header = (props: IHeaderProps) => {
                                         </div>
                                     </List.Item>
                                 </List.Group>
+                                <List.Divider />
                                 <List.Group>
-                                    {itemsData
-                                        .filter(
-                                            (item) => item.group === "profile"
-                                        )
-                                        .map((item, ind) => (
-                                            <List.Item key={item.title}>
-                                                <List.ItemPrefix>
-                                                    <Icon name={item.icon} />
-                                                </List.ItemPrefix>
-                                                {item.title}
-                                            </List.Item>
-                                        ))}
+                                    <List.Item>
+                                        <List.ItemPrefix>
+                                            <Icon name="FiMoon" />
+                                        </List.ItemPrefix>
+                                        Dark
+                                    </List.Item>
+                                    <List.Item onClick={toggleFullScreen}>
+                                        <List.ItemPrefix>
+                                            <Icon
+                                                name={
+                                                    document?.fullscreenElement
+                                                        ? "FiMinimize"
+                                                        : "FiMaximize"
+                                                }
+                                            />
+                                        </List.ItemPrefix>
+                                        Tela cheia
+                                    </List.Item>
+                                </List.Group>
+                                <List.Divider />
+                                <List.Group>
+                                    <List.Item>
+                                        <List.ItemPrefix>
+                                            <Icon name="TbLanguage" />
+                                        </List.ItemPrefix>
+                                        Portugues
+                                    </List.Item>
+                                </List.Group>
+                                <List.Divider />
+                                <List.Group>
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/logger")
+                                        }
+                                    >
+                                        <List.ItemPrefix>
+                                            <Icon name="PiDevToLogo" />
+                                        </List.ItemPrefix>
+                                        Log
+                                    </List.Item>
+                                </List.Group>
+                                <List.Divider />
+                                <List.Group>
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/suport")
+                                        }
+                                    >
+                                        <List.ItemPrefix>
+                                            <Icon name="MdOutlineSupportAgent" />
+                                        </List.ItemPrefix>
+                                        Suporte
+                                    </List.Item>
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/help")
+                                        }
+                                    >
+                                        <List.ItemPrefix>
+                                            <Icon name="FiHelpCircle" />
+                                        </List.ItemPrefix>
+                                        Ajuda
+                                    </List.Item>
                                 </List.Group>
                                 <List.Group>
-                                    {itemsData
-                                        .filter(
-                                            (item) => item.group === "geral"
-                                        )
-                                        .map((item) => (
-                                            <List.Item key={item.title}>
-                                                <List.ItemPrefix>
-                                                    <Icon name={item.icon} />
-                                                </List.ItemPrefix>
-                                                {item.title}
-                                            </List.Item>
-                                        ))}
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/privacypolicy")
+                                        }
+                                    >
+                                        <List.ItemPrefix>
+                                            <Icon name="MdOutlinePrivacyTip" />
+                                        </List.ItemPrefix>
+                                        Politica de Privacidade
+                                    </List.Item>
+                                    <List.Item
+                                        onClick={() =>
+                                            handleNavigate("/app/termsofuse")
+                                        }
+                                    >
+                                        <List.ItemPrefix>
+                                            <Icon name="AiOutlineAudit" />
+                                        </List.ItemPrefix>
+                                        Termos de uso
+                                    </List.Item>
                                 </List.Group>
+                                <List.Divider />
                                 <List.Group>
                                     <List.Item onClick={handleSingout}>
                                         <List.ItemPrefix>
@@ -204,16 +400,23 @@ const Header = (props: IHeaderProps) => {
                     }
                 >
                     <IconButton
-                        onClick={() => setOpen(!open)}
+                        onClick={() => setOpenUser(!openUser)}
                         color="gray"
                         variant="text"
                     >
                         <Icon name="FiUser" size="1.3rem" />
                     </IconButton>
-                </Popover> */}
+                </Popover>
 
                 <IconButton onClick={handleToolbar} color="gray" variant="text">
-                    <Icon name="FiMoreVertical" size="1.3rem" />
+                    <Icon
+                        name="FiMoreVertical"
+                        size="1.3rem"
+                        className={joinClassName(
+                            "transition",
+                            openRight ? "rotate-90" : "rotate-0"
+                        )}
+                    />
                 </IconButton>
             </div>
         </header>

@@ -34,6 +34,20 @@ const ItemSkeleton = forwardRef<HTMLDivElement, ISkeletonProps>(
     }
 );
 
+const Divider = ({ className = "", ...rest }: any) => {
+    return (
+        <div
+            {...rest}
+            className={joinClassName(
+                "w-full border-b border-slate-400",
+                className
+            )}
+        >
+            {" "}
+        </div>
+    );
+};
+
 interface IItemPrefix extends ComponentProps<"div"> {
     children: ReactNode;
 }
@@ -177,7 +191,6 @@ const Nav = forwardRef<HTMLElement, INavProps>(
                     "font-normal",
                     "text-gray-700",
                     "overflow-hidden",
-                    "divide-y",
                     className
                 )}
                 {...rest}
@@ -228,6 +241,7 @@ const List = {
     ItemPrefix,
     ItemSkeleton,
     ItemSuffix,
+    Divider,
     Nav,
 };
 

@@ -1,8 +1,15 @@
 import { Icon } from "@/lib";
 import { joinClassName } from "@/utils";
-import { ComponentProps, ReactNode, forwardRef } from "react";
+import {
+    ComponentProps,
+    ReactNode,
+    forwardRef,
+    useEffect,
+    useRef,
+} from "react";
 
 interface IContainerProps {
+    id?: string;
     open: boolean;
     toggle: () => void;
     children: ReactNode;
@@ -45,7 +52,6 @@ const Btn = forwardRef<HTMLButtonElement, IBtnProps>((props, ref) => {
                     "gap-2",
                     "transition",
                     "transition-width",
-                    "duration-300",
                     "h-12",
                     "w-full",
                     "rounded-lg",
@@ -151,7 +157,23 @@ const Btn = forwardRef<HTMLButtonElement, IBtnProps>((props, ref) => {
 });
 
 const Container = (props: IContainerProps) => {
-    const { open, toggle, children, direction = "left" } = props;
+    const { id, open, toggle, children, direction = "left" } = props;
+
+    const refMounted = useRef(false);
+    const refDiv = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (refMounted.current) {
+            refDiv.current?.classList.remove("animate-show-open");
+            refDiv.current?.classList.remove("animate-show-close");
+            if (open) {
+                refDiv.current?.classList.add("animate-show-open");
+            } else {
+                refDiv.current?.classList.add("animate-show-close");
+            }
+        }
+        refMounted.current = true;
+    }, [open]);
 
     return (
         <>
@@ -165,7 +187,6 @@ const Container = (props: IContainerProps) => {
                     "bg-gray-900/50",
                     "text-white",
                     "z-40",
-                    "top-16",
                     direction === "left"
                         ? joinClassName("rounded-tr-md", "left-0")
                         : joinClassName("rounded-tl-md", "right-0"),
@@ -174,29 +195,27 @@ const Container = (props: IContainerProps) => {
                 onClick={toggle}
             />
             <div
+                ref={refDiv}
+                id={id}
                 className={joinClassName(
                     open ? "fixed" : "",
                     "flex",
                     "flex-col",
-                    "transition",
-                    "duration-300",
-                    "transition-width",
                     "h-full",
                     "items-center",
                     "justify-start",
                     "overflow-hidden",
                     "bg-blue-main",
                     "text-white",
-                    "top-16",
-                    "transition-height",
-                    "ease-in-out",
-                    "p-0 lg:p-2",
+                    "p-0",
+                    "lg:p-2",
+                    "animate-show",
                     direction === "left"
                         ? joinClassName("rounded-tr-md", "left-0")
                         : joinClassName("rounded-tl-md", "right-0"),
                     open
                         ? joinClassName("w-96", "z-50")
-                        : joinClassName("w-0", "lg:w-16")
+                        : joinClassName("w-0", "lg:w-16", "lg:min-w-[4rem]")
                 )}
             >
                 {children}

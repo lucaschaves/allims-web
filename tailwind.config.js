@@ -18,48 +18,52 @@ export default {
                 },
             },
             transitionProperty: {
-                width: "width",
-                height: "height",
-                maxHeight: "max-height",
+                // width: "width",
+                // height: "height",
+                // maxHeight: "max-height",
+                // maxWidth: "max-width",
+                // minHeight: "min-height",
+                // minWidth: "min-width",
             },
             boxShadow: {
                 select: "inset rgb(49 139 225 / 51%) 0px 0px 1px 1px",
             },
             keyframes: {
-                "fade-in": {
-                    "0%": {
+                show: {
+                    from: {
                         opacity: "0",
-                        transform: "translateY(-10px)",
+                        transform: "translateY(10px)",
                     },
-                    "100%": {
+                    to: {
                         opacity: "1",
                         transform: "translateY(0)",
                     },
                 },
-                "fade-out": {
-                    "100%": {
-                        opacity: "1",
-                        transform: "translateY(0)",
+                open: {
+                    from: {
+                        "min-width": "4rem",
+                        width: "4rem",
                     },
-                    "0%": {
-                        opacity: "0",
-                        transform: "translateY(-10px)",
+                    to: {
+                        "min-width": "24rem",
+                        width: "24rem",
                     },
                 },
-                "wiggle-open": {
-                    "0%, 100%": { transform: "rotate(0deg)" },
-                    "50%": { transform: "rotate(180deg)" },
-                },
-                "wiggle-close": {
-                    "0%, 100%": { transform: "rotate(0deg)" },
-                    "50%": { transform: "rotate(180deg)" },
+                close: {
+                    from: {
+                        "min-width": "24rem",
+                        width: "24rem",
+                    },
+                    to: {
+                        "min-width": "4rem",
+                        width: "4rem",
+                    },
                 },
             },
             animation: {
-                "fade-in": "fade-in 300ms ease-in",
-                "fade-out": "fade-out 300ms ease-out",
-                "wiggle-open": "wiggle-open 1s linear",
-                "wiggle-close": "wiggle-close 1+++++++++s linear",
+                show: "show 300ms linear",
+                "show-open": "open 300ms linear",
+                "show-close": "close 300ms linear",
             },
         },
     },

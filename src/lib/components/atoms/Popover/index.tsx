@@ -26,26 +26,46 @@ const Popover = (props: IPopoverProps) => {
         top: 0,
         opacity: 0,
         left: 0,
+        arrow: "left-top",
     });
 
     useEffect(() => {
         if (open) {
-            const element = ref.current?.getBoundingClientRect() || {
+            const elementChildren = ref.current?.getBoundingClientRect() || {
                 top: 0,
                 height: 0,
                 left: 0,
                 width: 0,
             };
+
+            const elementContent =
+                refContent.current?.getBoundingClientRect() || {
+                    top: 0,
+                    height: 0,
+                    left: 0,
+                    width: 0,
+                };
             const clientWidth = ref.current?.clientWidth ?? 25;
             const clientHeight = ref.current?.clientHeight ?? 25;
             const objPos = {
-                top: element.top + clientHeight / 4,
+                top: elementChildren.top + clientHeight / 4,
                 opacity: 1,
-                left: clientWidth + element.left,
+                left: clientWidth + elementChildren.left,
+                arrow: "left-top",
             };
             if (objPos.left < 0) {
                 objPos.left = 5;
             }
+            const bodyWidth = document.body.getBoundingClientRect().width;
+            const positionWidth = elementContent.width + objPos.left;
+            if (bodyWidth <= positionWidth) {
+                const newLeft = positionWidth - bodyWidth;
+                objPos.left =
+                    objPos.left - newLeft - elementChildren.width - 20;
+                objPos.top = objPos.top + elementChildren.top + 20;
+                objPos.arrow = "top-right";
+            }
+
             setPosition(objPos);
         }
     }, [open]);
@@ -84,19 +104,35 @@ const Popover = (props: IPopoverProps) => {
                                 "ease-in-out",
                                 "before:content-[' ']",
                                 "before:absolute",
-                                "before:top-4",
-                                "before:-left-0.5",
+                                "before:bg-white",
+                                "before:border-white",
                                 "before:transform",
-                                "before:-translate-x-1",
-                                "before:-translate-y-2",
-                                "before:rotate-45",
                                 "before:w-4",
                                 "before:h-4",
-                                "before:bg-white",
-                                "before:border-l",
-                                "before:border-t",
                                 "before:rounded",
-                                "before:border-white"
+
+                                position.arrow === "left-top"
+                                    ? joinClassName(
+                                          "before:top-4",
+                                          "before:-left-0.5",
+                                          "before:-translate-x-1",
+                                          "before:-translate-y-2",
+                                          "before:rotate-45",
+                                          "before:border-l",
+                                          "before:border-t"
+                                      )
+                                    : position.arrow === "top-right"
+                                    ? joinClassName(
+                                          "before:top-0",
+                                          "before:right-4",
+                                          "before:-translate-x-2",
+                                          "before:-translate-y-1.5",
+                                          "before:rotate-45",
+                                          "before:border-l",
+                                          "before:border-r",
+                                          "before:border-t"
+                                      )
+                                    : joinClassName("")
                             )}
                             onClick={(e) => {
                                 e.preventDefault();

@@ -323,18 +323,14 @@ const ListVirtual = forwardRef<IListRef, IListVirtual>((props, ref) => {
                                             <div className="p-4 rounded flex flex-col gap-2">
                                                 <Button
                                                     size="sm"
-                                                    onClick={() =>
-                                                        console.log("editar")
-                                                    }
+                                                    onClick={() => ({})}
                                                     className="flex gap-2"
                                                 >
                                                     <FiEdit /> Editar
                                                 </Button>
                                                 <Button
                                                     size="sm"
-                                                    onClick={() =>
-                                                        console.log("remover")
-                                                    }
+                                                    onClick={() => ({})}
                                                     className="flex gap-2"
                                                 >
                                                     <FiTrash /> Remover
@@ -718,7 +714,7 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                                     <div
                                         className={joinClassName(
                                             "flex items-center justify-start gap-2",
-                                            "animate-fade-out"
+                                            "animate-show"
                                         )}
                                     >
                                         <label
@@ -748,7 +744,7 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                                     <div
                                         className={joinClassName(
                                             "flex items-center justify-start gap-2",
-                                            "animate-fade-out"
+                                            "animate-show"
                                         )}
                                     >
                                         <label
@@ -781,7 +777,7 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                                 onClick={toggleAdd}
                                 size="sm"
                             >
-                                <FiPlus className="animate-fade-out" />
+                                <FiPlus className="animate-show" />
                             </IconButton>
                         </div>
                         <ListVirtual

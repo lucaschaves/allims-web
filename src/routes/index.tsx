@@ -1,59 +1,40 @@
 import { Form } from "@/components";
-import { FAKER_MODULES } from "@/faker";
 import { RequireAuth } from "@/hooks";
 import { Layout } from "@/layout";
-import { Login } from "@/pages";
+import { Login, NotFound } from "@/pages";
+import { FAKER_MODULES, MODULES_LOCAL } from "@/server";
+import { Test } from "@/test";
 import { createChildrensPath } from "@/utils";
-import { createMemoryRouter } from "react-router-dom";
+import { RouteObject, createBrowserRouter } from "react-router-dom";
 
-{
-    /* <Route
-        path={rot}
-        loader={() => {
-            console.log("loading");
-            return "";
-        }}
-        errorElement={<div>Error</div>}
-        id
-        index
-        action
-        hasErrorBoundary
-        shouldRevalidate
-        children
-        caseSensitive
-        lazy
-        handle
-        element={<Form name={rot} />}
-        Component
-        ErrorBoundary
-    /> */
-}
-
-async function loader({ params }: any) {
-    console.log("loader", params);
-
+async function loader(params?: any) {
     return {
-        data: [{ id: 1 }],
-        success: true,
+        ...params,
     };
 }
 
-function createPaths(arr: any[]): any {
+function createPaths(arr: any[]): RouteObject[] {
     return arr.map((a) => {
         if (a.children) {
             return {
                 ...a,
-                loader: loader,
+                path: `${a.path}/:id?`,
+                loader,
                 errorElement: <div>Error</div>,
-                element: <Form name={a.title} />,
+                element:
+                    a.parent === "" ? null : (
+                        <Form name={a.title} route={a.path} />
+                    ),
                 children: createPaths(a.children),
             };
         }
         return {
             ...a,
-            loader: loader,
+            path: `${a.path}/:id?`,
+            loader,
             errorElement: <div>Error</div>,
-            element: <Form name={a.title} />,
+            element:
+                a.parent === "" ? null : <Form name={a.title} route={a.path} />,
         };
     });
 }
@@ -61,25 +42,52 @@ function createPaths(arr: any[]): any {
 export function appRoutes() {
     const childrensFake = createChildrensPath(FAKER_MODULES);
     const routesPath = createPaths(childrensFake);
-    const routes = createMemoryRouter([
+
+    const childrensLocal = createChildrensPath(MODULES_LOCAL);
+    const routesPathLocal = createPaths(childrensLocal);
+
+    // const routes = createMemoryRouter(
+    const routes = createBrowserRouter(
+        [
+            {
+                path: "/login",
+                element: <Login />,
+            },
+            {
+                path: "/test",
+                element: <Test />,
+            },
+            {
+                path: "/app",
+                element: (
+                    <RequireAuth>
+                        <Layout />
+                    </RequireAuth>
+                ),
+                children: routesPathLocal,
+            },
+            {
+                path: "/",
+                element: (
+                    <RequireAuth>
+                        <Layout />
+                    </RequireAuth>
+                ),
+                children: routesPath,
+            },
+            {
+                path: "*",
+                element: (
+                    <RequireAuth>
+                        <NotFound />
+                    </RequireAuth>
+                ),
+            },
+        ],
         {
-            path: "/login",
-            element: <Login />,
-        },
-        {
-            path: "/",
-            element: (
-                <RequireAuth>
-                    <Layout />
-                </RequireAuth>
-            ),
-            children: routesPath,
-        },
-        {
-            path: "*",
-            element: <div>Error</div>,
-        },
-    ]);
+            // initialEntries: ["/module/analitico/gerenciamentoDeAmostras"],
+        }
+    );
 
     return routes;
 }

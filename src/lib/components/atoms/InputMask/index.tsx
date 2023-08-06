@@ -168,7 +168,6 @@ const InputMask: React.FC<IInputMaskProps> = ({
     }, [setTypedValue, typedValue, value]);
 
     const onDefaultDateRange = useCallback(() => {
-        console.log("value", value);
         if (
             (value?.startDate &&
                 value?.endDate &&
@@ -181,8 +180,6 @@ const InputMask: React.FC<IInputMaskProps> = ({
             !value?.endDate &&
             typedValue?.startDate !== value.startDate
         ) {
-            console.log("else ondefault typed", typedValue);
-
             // setTypedValue(value);
         }
     }, [setTypedValue, typedValue?.endDate, typedValue?.startDate, value]);
