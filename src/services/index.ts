@@ -1,4 +1,6 @@
+import { logger } from "@/hooks";
 import axios, { AxiosRequestConfig } from "axios";
+import { toast } from "react-toastify";
 import api from "./client";
 
 interface IGetProps {
@@ -24,7 +26,22 @@ const headersDefault = {
     },
 };
 
-export const getApi = async (props: IGetProps) => {
+const formatError = (message: string) => {
+    try {
+        console.error("error post message: ", message);
+        toast.error(message);
+        logger({ type: "error", message });
+    } catch (err) {
+        console.error("formatError: ", err);
+    }
+    return {
+        message,
+        data: null,
+        success: false,
+    };
+};
+
+export const getApi = async <T>(props: IGetProps) => {
     const { url, config = {} } = props;
     try {
         const {
@@ -34,65 +51,42 @@ export const getApi = async (props: IGetProps) => {
             ...headersDefault,
             ...config,
         });
-
         return {
-            data,
+            data: data as T,
             status,
             success,
         };
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.error("error message: ", err.message);
-            return {
-                message: err.message,
-                success: false,
-            };
+            return formatError(err.message);
         } else {
-            console.error("unexpected get error: ", err);
-            return {
-                message: "An unexpected error occurred",
-                success: false,
-            };
+            const message = JSON.stringify(err);
+            return formatError(message);
         }
     }
 };
 
-export const postApi = async (props: IPostProps) => {
+export const postApi = async <T>(props: IPostProps) => {
     const { url, body = {}, config = {} } = props;
     try {
-        return {
-            success: true,
-            status: 200,
-            data: {
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZTUxMTA2NDgtNzlmMC00MzE2LWI2NDUtMDczOTJkYWNhZmNkIiwiaWF0IjoxNjg3ODg1MTU2LCJleHAiOjE2ODc5NzE1NTZ9.7LNr6jgBae_aMlpJhezW3v7WSUDw3L60JAQPDQI7Xt8",
-                route: "/",
-            },
-        };
         const {
             data: { data, success },
             status,
-        } = await api.post(url, body, {
+        } = await api.post<IResponse>(url, body, {
             ...headersDefault,
             ...config,
         });
         return {
-            data,
+            data: data as T,
             status,
             success,
         };
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.error("error post message: ", err.message);
-            return {
-                message: err.message,
-                success: false,
-            };
+            return formatError(err.message);
         } else {
-            console.error("unexpected post error: ", err);
-            return {
-                message: "An unexpected error occurred",
-                success: false,
-            };
+            const message = JSON.stringify(err);
+            return formatError(message);
         }
     }
 };

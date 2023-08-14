@@ -1,8 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: "class",
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: {
         extend: {
+            fontSize: {
+                xsm: "0.7rem",
+            },
             colors: {
                 "blue-main": "#14335b",
                 main: {
@@ -19,10 +23,10 @@ export default {
             },
             transitionProperty: {
                 // width: "width",
-                // height: "height",
-                // maxHeight: "max-height",
+                height: "height",
+                maxHeight: "max-height",
                 // maxWidth: "max-width",
-                // minHeight: "min-height",
+                minHeight: "min-height",
                 // minWidth: "min-width",
             },
             boxShadow: {
@@ -59,11 +63,18 @@ export default {
                         width: "4rem",
                     },
                 },
+                "close-full": {
+                    from: {
+                        right: "100%",
+                    },
+                    to: { right: "0px" },
+                },
             },
             animation: {
                 show: "show 300ms linear",
                 "show-open": "open 300ms linear",
                 "show-close": "close 300ms linear",
+                "show-close-full": "close-full 300ms linear",
             },
         },
     },

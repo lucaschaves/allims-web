@@ -15,4 +15,50 @@
     --main-color-700: #071c7c;
     --main-color-800: #071c7c;
     --main-color-900: #071c7c;
+
+    --main-color-scroll: #929292;
+    --main-color-scroll-bg: #dbdbdb;
+    --main-color-scroll-hover: #6d6d6d;
+
+    --main-shadow: #adadad;
+
+    --main-color-drop: #1a1a1a;
+    --main-color-drop-bg: #b6b6b6;
+    --main-color-drop-border: #707070;
+
+    --toastify-color-dark: #061144;
+}
+
+[data-theme="dark"] {
+    --main-color-scroll: #1c067e;
+    --main-color-scroll-bg: #1c0257;
+    --main-color-scroll-hover: #310286;
+
+    --main-color-drop: #ffffff;
+    --main-color-drop-bg: #071c7c;
+    --main-color-drop-border: #061144;
+
+    --main-shadow: #3d3d3d;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--main-color-scroll-bg);
+    border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--main-color-scroll);
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--main-color-scroll-hover);
 }

@@ -27,7 +27,6 @@ export function listToTree<
             res.push(node as any);
         }
     }
-
     return res;
 }
 

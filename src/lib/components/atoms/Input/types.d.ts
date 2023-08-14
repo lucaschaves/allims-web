@@ -3,7 +3,7 @@ import { ComponentProps } from "react";
 
 type TContainerProps = ComponentProps<"div">;
 export interface IInputProps extends ComponentProps<"input"> {
-    label: string;
+    label?: string;
     error?: boolean | string;
     success?: boolean | string;
     variant?: TVariant;

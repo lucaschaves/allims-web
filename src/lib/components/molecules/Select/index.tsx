@@ -650,6 +650,9 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                             "h-full",
                             "rounded",
                             "bg-white",
+                            "dark:bg-slate-800",
+                            "text-black",
+                            "dark:text-white",
                             "flex",
                             "flex-col",
                             "gap-y-4",
@@ -702,8 +705,11 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                         </div>
                         <div
                             className={joinClassName(
-                                "flex items-center justify-between w-full gap-2 transition ease-in-out",
+                                "flex items-center justify-between w-full gap-2 transition",
                                 "bg-gray-50",
+                                "dark:bg-slate-900",
+                                "text-black",
+                                "dark:text-white",
                                 "rounded",
                                 "py-1",
                                 "pr-5"
@@ -796,6 +802,9 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                                 "items-center",
                                 "justify-between",
                                 "bg-gray-50",
+                                "dark:bg-slate-900",
+                                "text-black",
+                                "dark:text-white",
                                 "rounded",
                                 "py-1",
                                 "px-1",
@@ -809,14 +818,18 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                                     "gap-1"
                                 )}
                             >
-                                <span className="text-gray-700">
+                                <span className="text-gray-700 dark:text-white">
                                     Selecionados:
                                 </span>
-                                <span className="text-gray-700">
+                                <span className="text-gray-700 dark:text-white">
                                     {selected.length}
                                 </span>
-                                <span className="text-gray-700">/</span>
-                                <span className="text-gray-700">{total}</span>
+                                <span className="text-gray-700 dark:text-white">
+                                    /
+                                </span>
+                                <span className="text-gray-700 dark:text-white">
+                                    {total}
+                                </span>
                             </div>
                             <div
                                 className={joinClassName(
@@ -900,6 +913,9 @@ const Select = forwardRef<HTMLButtonElement, ISelectProps>(
                             "h-full",
                             "rounded",
                             "bg-white",
+                            "dark:bg-slate-800",
+                            "text-black",
+                            "dark:text-white",
                             "flex",
                             "flex-col",
                             "gap-y-4",

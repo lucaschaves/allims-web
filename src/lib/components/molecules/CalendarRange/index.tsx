@@ -379,6 +379,9 @@ const CalendarRange = forwardRef<HTMLInputElement, ICalendarRangeProps>(
                             "p-2",
                             "rounded",
                             "bg-white",
+                            "dark:bg-slate-800",
+                            "text-black",
+                            "dark:text-white",
                             "flex",
                             "flex-col",
                             "justify-between",
@@ -506,7 +509,12 @@ const CalendarRange = forwardRef<HTMLInputElement, ICalendarRangeProps>(
                                     : "-"}
                             </span>
                         </div>
-                        <div className="flex items-center justify-start w-full bg-gray-50 p-2 rounded">
+                        <div
+                            className="flex items-center justify-start w-full bg-white
+                            dark:bg-slate-900
+                            text-black
+                            dark:text-white p-2 rounded"
+                        >
                             <Button
                                 variant="text"
                                 size="sm"

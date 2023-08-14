@@ -9,6 +9,7 @@ import * as IconsIm from "react-icons/im";
 import * as IconsIo from "react-icons/io5";
 import * as IconsMd from "react-icons/md";
 import * as IconsPi from "react-icons/pi";
+import * as IconsRi from "react-icons/ri";
 import * as IconsSi from "react-icons/si";
 import * as IconsSl from "react-icons/sl";
 import * as IconsTb from "react-icons/tb";
@@ -31,6 +32,7 @@ const Icons = {
     Gr: IconsGr,
     Hi: IconsHi,
     Pi: IconsPi,
+    Ri: IconsRi,
 } as any;
 
 export const Icon = (props: IIconProps) => {

@@ -18,6 +18,7 @@ interface IContainerProps {
     hasButton?: boolean;
     direction?: "col" | "row";
     disabled?: boolean;
+    disabledResize?: boolean;
     handleResizeStart?: () => void;
 }
 
@@ -32,6 +33,7 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
         direction = "row",
         hasButton = false,
         disabled = false,
+        disabledResize = false,
         handleResizeStart = () => ({}),
     } = props;
 
@@ -183,7 +185,7 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
 
     const reset = useCallback(() => {
         if (refLeft.current?.style) {
-            refLeft.current.style.width = "100%";
+            refLeft.current.style.width = "";
         }
     }, [refLeft]);
 
@@ -202,7 +204,7 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
                 "w-full",
                 "h-full",
                 "transition-width",
-                "duration-500",
+                "duration-300",
                 "overflow-hidden",
                 "flex",
                 `flex-${direction}`
@@ -223,6 +225,7 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
                         "justify-end",
                         "border-2",
                         "border-slate-100",
+                        "dark:border-slate-800",
                         disabled ? "hidden" : ""
                     )}
                     ref={refResize}
@@ -259,8 +262,10 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
                         "duration-300",
                         "border-2",
                         "border-slate-200",
+                        "dark:border-slate-800",
                         "hover:scale-150",
                         "hover:border-slate-400",
+                        "dark:hover:border-slate-600",
                         direction === "col"
                             ? joinClassName(
                                   "cursor-ns-resize",
@@ -272,7 +277,8 @@ const Split = forwardRef<ISplitRef, IContainerProps>((props, ref) => {
                                   "h-full",
                                   "hover:-translate-y-1"
                               ),
-                        disabled ? "hidden" : ""
+                        disabled ? "hidden" : "",
+                        disabledResize ? "hidden" : ""
                     )}
                     ref={refResize}
                     onMouseDown={mouseDownHandler}

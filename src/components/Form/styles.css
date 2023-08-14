@@ -1,4 +1,4 @@
 .allims-form-fixed {
-    box-shadow: -2px 1px 5px 0px #898787;
+    box-shadow: -2px 1px 5px 0px var(--main-shadow);
     animation-fill-mode: forwards;
 }

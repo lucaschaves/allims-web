@@ -15,7 +15,6 @@ const Backdrop = forwardRef<HTMLDivElement, IBackdropProps>(
                     "overflow-hidden",
                     "transition-all",
                     "duration-300",
-                    "ease-in-out",
                     "z-20",
                     "w-full",
                     "h-full",

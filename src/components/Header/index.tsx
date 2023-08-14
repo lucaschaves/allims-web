@@ -1,4 +1,5 @@
-import { useAuth } from "@/context";
+import { CONSTANT_THEME } from "@/constants";
+import { useAuth, useMenu } from "@/context";
 import {
     Avatar,
     Breadcrumb,
@@ -9,8 +10,8 @@ import {
     Tag,
     getMeta,
 } from "@/lib";
-import { FAKER_MODULES, MODULES_LOCAL } from "@/server";
-import { joinClassName } from "@/utils";
+import { MODULES_LOCAL } from "@/server";
+import { joinClassName, removeDuplicateObjects } from "@/utils";
 import { MouseEvent, useCallback, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -22,13 +23,13 @@ interface IHeaderProps {
 }
 
 const Header = (props: IHeaderProps) => {
-    const { openLeft, openRight, toggleSidebar, toggleToolbar } = props;
-
+    const { contextMenuAll } = useMenu();
     const { pathname } = useLocation();
     const navigate = useNavigate();
 
     const { signout } = useAuth();
 
+    const theme = window.localStorage.getItem(CONSTANT_THEME) || "light";
     const metaEnvorimentTag = getMeta("envTag");
     const metaEnvorimentTagColor = getMeta("envColor") || "transparent";
 
@@ -47,18 +48,31 @@ const Header = (props: IHeaderProps) => {
             return breads;
         }
         const breads = pathSplit
-            .filter((p) => !!FAKER_MODULES.find((f) => f.path === p))
-            .map((p) => FAKER_MODULES.find((f) => f.path === p));
+            .filter((p) => !!contextMenuAll.find((f) => f.path === p))
+            .map((p) => {
+                const findAll = contextMenuAll.find((f) => f.path === p) as any;
+                if (findAll?.children) {
+                    const newChild = removeDuplicateObjects(
+                        findAll.children,
+                        "path"
+                    );
+                    return {
+                        ...findAll,
+                        children: newChild,
+                    };
+                }
+                return findAll;
+            });
         return breads;
-    }, [pathname]);
+    }, [contextMenuAll, pathname]);
 
-    const handleSidebar = useCallback(() => {
-        toggleSidebar();
-    }, [toggleSidebar]);
+    // const handleSidebar = useCallback(() => {
+    //     toggleSidebar();
+    // }, [toggleSidebar]);
 
-    const handleToolbar = useCallback(() => {
-        toggleToolbar();
-    }, [toggleToolbar]);
+    // const handleToolbar = useCallback(() => {
+    //     toggleToolbar();
+    // }, [toggleToolbar]);
 
     const handleSingout = useCallback(() => {
         signout(() => {
@@ -83,6 +97,15 @@ const Header = (props: IHeaderProps) => {
         setOpenUser(false);
     }, []);
 
+    const toggleTheme = useCallback(() => {
+        const theme = window.localStorage.getItem(CONSTANT_THEME);
+        window.localStorage.setItem(
+            CONSTANT_THEME,
+            theme === "dark" ? "light" : "dark"
+        );
+        location.reload();
+    }, []);
+
     const handleNavigate = useCallback(
         (path: string) => {
             navigate(path);
@@ -96,7 +119,10 @@ const Header = (props: IHeaderProps) => {
             className={joinClassName(
                 "w-full",
                 "h-16",
+                "min-h-[4rem]",
                 "bg-gray-200",
+                "dark:text-white",
+                "dark:bg-slate-950/20",
                 "text-base",
                 "flex",
                 "items-center",
@@ -119,22 +145,26 @@ const Header = (props: IHeaderProps) => {
                 )}
             >
                 <IconButton
-                    onClick={handleSidebar}
+                    // onClick={handleSidebar}
                     color="gray"
                     variant="text"
                     className={joinClassName(
-                        "transition",
-                        openLeft ? "rotate-180" : "rotate-0"
+                        "transition"
+                        // openLeft ? "rotate-180" : "rotate-0"
                     )}
                 >
-                    {openLeft ? (
+                    {/* {openLeft ? (
                         <Icon name="FiX" size="1.3rem" />
-                    ) : (
-                        <Avatar
-                            alt="Allims"
-                            src="https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png"
-                        />
-                    )}
+                    ) : ( */}
+                    <Avatar
+                        alt="Allims"
+                        src={
+                            theme === "light"
+                                ? "https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_color.png"
+                                : "https://allims-files.s3.sa-east-1.amazonaws.com/front/allims_logo_white.png"
+                        }
+                    />
+                    {/* )} */}
                 </IconButton>
                 <Breadcrumb.Container>
                     {breadcrumbPaths().map((p: any, i, arr) =>
@@ -145,6 +175,7 @@ const Header = (props: IHeaderProps) => {
                                     to={p?.route ?? "/"}
                                     className={joinClassName(
                                         "text-gray-900 hover:text-blue-800",
+                                        "dark:text-white dark:hover:text-slate-300",
                                         activeRoute === "module"
                                             ? "text-red-500"
                                             : ""
@@ -218,6 +249,7 @@ const Header = (props: IHeaderProps) => {
                                     to={p?.route ?? "/"}
                                     className={joinClassName(
                                         "text-gray-900 hover:text-blue-800",
+                                        "dark:text-white dark:hover:text-slate-300",
                                         activeRoute === "module"
                                             ? "text-red-500"
                                             : ""
@@ -300,11 +332,17 @@ const Header = (props: IHeaderProps) => {
                                 </List.Group>
                                 <List.Divider />
                                 <List.Group>
-                                    <List.Item>
+                                    <List.Item onClick={toggleTheme}>
                                         <List.ItemPrefix>
-                                            <Icon name="FiMoon" />
+                                            <Icon
+                                                name={
+                                                    theme === "light"
+                                                        ? "FiMoon"
+                                                        : "FiSun"
+                                                }
+                                            />
                                         </List.ItemPrefix>
-                                        Dark
+                                        {theme === "light" ? "Dark" : "Light"}
                                     </List.Item>
                                     <List.Item onClick={toggleFullScreen}>
                                         <List.ItemPrefix>
@@ -404,20 +442,21 @@ const Header = (props: IHeaderProps) => {
                         color="gray"
                         variant="text"
                     >
-                        <Icon name="FiUser" size="1.3rem" />
+                        <Icon name="FiMoreVertical" size="1.3rem" />
                     </IconButton>
                 </Popover>
 
-                <IconButton onClick={handleToolbar} color="gray" variant="text">
+                {/* <IconButton onClick={handleToolbar} color="gray" variant="text">
                     <Icon
-                        name="FiMoreVertical"
+                        name="FiMenu"
                         size="1.3rem"
                         className={joinClassName(
                             "transition",
+                            "duration-300",
                             openRight ? "rotate-90" : "rotate-0"
                         )}
                     />
-                </IconButton>
+                </IconButton> */}
             </div>
         </header>
     );

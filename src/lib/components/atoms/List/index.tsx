@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode, forwardRef } from "react";
 import { ISkeletonProps } from "../../../types";
 import { joinClassName } from "../../../utils";
+import "./styles.css";
 import { IContainerProps, IItemProps } from "./types.d";
 
 const defaultSizeCss = {
@@ -25,6 +26,7 @@ const ItemSkeleton = forwardRef<HTMLDivElement, ISkeletonProps>(
                     "transition-all",
                     "outline-none",
                     "bg-gray-100",
+                    "dark:bg-slate-800",
                     "animate-pulse",
                     defaultSizeCss[size]
                 )}
@@ -39,7 +41,7 @@ const Divider = ({ className = "", ...rest }: any) => {
         <div
             {...rest}
             className={joinClassName(
-                "w-full border-b border-slate-400",
+                "w-full border-b border-slate-400 dark:border-slate-600",
                 className
             )}
         >
@@ -113,6 +115,8 @@ const Item = forwardRef<HTMLDivElement, IItemProps>(
                     "hover:bg-opacity-80",
                     "focus:bg-opacity-80",
                     "active:bg-opacity-80",
+                    "text-black",
+                    "dark: text-white",
                     defaultSizeCss[size],
                     active
                         ? joinClassName(
@@ -131,7 +135,9 @@ const Item = forwardRef<HTMLDivElement, IItemProps>(
                               "active:bg-gray-100",
                               "hover:text-gray-900",
                               "focus:text-gray-900",
-                              "active:text-gray-900"
+                              "active:text-gray-900",
+                              "dark:hover:bg-slate-700",
+                              "dark:hover:text-slate-200"
                           ),
                     className
                 )}
@@ -161,6 +167,7 @@ const Group = forwardRef<HTMLDivElement, IGroupProps>(
                     "text-base",
                     "font-normal",
                     "text-gray-700",
+                    "dark:text-white",
                     "overflow-hidden",
                     className
                 )}
@@ -190,6 +197,7 @@ const Nav = forwardRef<HTMLElement, INavProps>(
                     "text-base",
                     "font-normal",
                     "text-gray-700",
+                    "dark:text-white",
                     "overflow-hidden",
                     className
                 )}
@@ -215,7 +223,11 @@ const Container = forwardRef<HTMLDivElement, IContainerProps>(
                     "rounded-xl",
                     "bg-white",
                     "text-gray-700",
+                    "dark:bg-slate-800",
+                    "dark:text-white",
                     shadow ? "shadow-md" : "",
+                    "overflow-auto",
+                    "max-h-[calc(100vh-50px)]",
                     className
                 )}
                 {...rest}

@@ -24,6 +24,7 @@ const Popover = (props: IPopoverProps) => {
 
     const [position, setPosition] = useState({
         top: 0,
+        bottom: -1,
         opacity: 0,
         left: 0,
         arrow: "left-top",
@@ -36,6 +37,7 @@ const Popover = (props: IPopoverProps) => {
                 height: 0,
                 left: 0,
                 width: 0,
+                bottom: 0,
             };
 
             const elementContent =
@@ -44,6 +46,7 @@ const Popover = (props: IPopoverProps) => {
                     height: 0,
                     left: 0,
                     width: 0,
+                    bottom: 0,
                 };
             const clientWidth = ref.current?.clientWidth ?? 25;
             const clientHeight = ref.current?.clientHeight ?? 25;
@@ -52,6 +55,7 @@ const Popover = (props: IPopoverProps) => {
                 opacity: 1,
                 left: clientWidth + elementChildren.left,
                 arrow: "left-top",
+                bottom: 0,
             };
             if (objPos.left < 0) {
                 objPos.left = 5;
@@ -64,6 +68,18 @@ const Popover = (props: IPopoverProps) => {
                     objPos.left - newLeft - elementChildren.width - 20;
                 objPos.top = objPos.top + elementChildren.top + 20;
                 objPos.arrow = "top-right";
+            }
+            const bodyHeight = document.body.getBoundingClientRect().height;
+            const positionHeight = elementContent.height + objPos.top;
+
+            if (bodyHeight <= positionHeight) {
+                const newBottom = positionHeight - bodyHeight;
+                const bottomPos =
+                    objPos.bottom - newBottom - elementChildren.height - 20;
+
+                objPos.top = -1;
+                objPos.bottom = bottomPos >= 10 ? bottomPos : 10;
+                objPos.arrow = "bottom-left";
             }
 
             setPosition(objPos);
@@ -100,17 +116,19 @@ const Popover = (props: IPopoverProps) => {
                                 "shadow-2xl",
                                 "transition",
                                 "duration-300",
+                                "overflow-auto",
                                 "bg-white",
-                                "ease-in-out",
+                                "dark:bg-slate-800",
                                 "before:content-[' ']",
                                 "before:absolute",
                                 "before:bg-white",
                                 "before:border-white",
+                                "dark:before:bg-slate-800",
+                                "dark:before:border-slate-800",
                                 "before:transform",
                                 "before:w-4",
                                 "before:h-4",
                                 "before:rounded",
-
                                 position.arrow === "left-top"
                                     ? joinClassName(
                                           "before:top-4",
@@ -139,7 +157,9 @@ const Popover = (props: IPopoverProps) => {
                                 e.stopPropagation();
                             }}
                             style={{
-                                top: position.top,
+                                top: position.top > 0 ? position.top : "",
+                                bottom:
+                                    position.bottom > 0 ? position.bottom : "",
                                 left: position.left,
                                 opacity: position.opacity,
                                 zIndex: 999,

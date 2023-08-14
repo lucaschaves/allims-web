@@ -3,4 +3,5 @@ export interface IIconProps {
     size?: string;
     className?: string;
     disabled?: boolean;
+    onClick?: (e: any) => void;
 }
